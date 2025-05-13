@@ -2,8 +2,10 @@
 
 namespace App\Models;
 
+use App\Enums\LibraryRole;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
@@ -33,6 +35,27 @@ class User extends Authenticatable
         'password',
         'remember_token',
     ];
+
+    public function libraries()
+    {
+        return $this->belongsToMany(Library::class)
+            ->withPivot('role')
+            ->using(LibraryUser::class)
+            ->withTimestamps();
+    }
+
+    public function libraryRole(Library $library): ?LibraryRole
+    {
+        $pivot = $this->libraries()
+            ->where('libraries.id', $library->id)
+            ->first()?->pivot;
+        return $pivot?->role;
+    }
+
+    public function hasLibraryRoleAtLeast(Library $library, LibraryRole $role): bool
+    {
+        return $this->libraryRole($library)?->level() >= $role->level();
+    }
 
     /**
      * Get the attributes that should be cast.
