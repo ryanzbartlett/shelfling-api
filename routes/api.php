@@ -23,4 +23,5 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('libraries/{library}', [LibraryController::class, 'show']);
     Route::put('libraries/{library}', [LibraryController::class, 'update']);
     Route::delete('libraries/{library}', [LibraryController::class, 'destroy']);
+    Route::post('libraries/{library}/users', [LibraryController::class, 'addUsers']);
 });

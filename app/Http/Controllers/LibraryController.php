@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Enums\LibraryRole;
+use App\Http\Requests\AddLibraryUsersRequest;
 use App\Http\Requests\LibraryRequest;
 use App\Http\Resources\LibraryResource;
 use App\Models\Library;
+use App\Models\User;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 
@@ -54,6 +56,22 @@ class LibraryController extends Controller
         $this->authorize('delete', $library);
 
         $library->delete();
+
+        return response()->json();
+    }
+
+    public function addUsers(AddLibraryUsersRequest $request, Library $library)
+    {
+        $this->authorize('update', $library);
+
+        foreach ($request->input('users') as $userData) {
+            $user = User::where('email', $userData['email'])->first();
+            if ($user) {
+                $library->users()->syncWithoutDetaching([
+                    $user->id => ['role' => $userData['role']],
+                ]);
+            }
+        }
 
         return response()->json();
     }
