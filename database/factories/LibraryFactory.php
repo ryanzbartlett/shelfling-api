@@ -14,7 +14,7 @@ class LibraryFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => $this->faker->words(3, true),
+            'name' => $this->faker->sentence(3),
             'type' => $this->faker->randomElement([LibraryType::BOOK->value, LibraryType::MOVIE->value]),
             'created_at' => Carbon::now(),
             'updated_at' => Carbon::now(),
