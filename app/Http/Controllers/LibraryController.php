@@ -7,6 +7,7 @@ use App\Http\Requests\AddLibraryUsersRequest;
 use App\Http\Requests\LibraryRequest;
 use App\Http\Requests\RemoveLibraryUserRequest;
 use App\Http\Resources\LibraryResource;
+use App\Http\Resources\LibraryUserResource;
 use App\Models\Library;
 use App\Models\User;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -90,5 +91,18 @@ class LibraryController extends Controller
         }
         
         return response()->json(['message' => 'User is not a member of this library'], 422);
+    }
+    
+    /**
+     * Get all users for a specific library with their roles.
+     */
+    public function getUsers(Library $library)
+    {
+        $this->authorize('view', $library);
+        
+        // Eager load the pivot data which contains the role
+        $users = $library->users()->get();
+        
+        return LibraryUserResource::collection($users);
     }
 }
