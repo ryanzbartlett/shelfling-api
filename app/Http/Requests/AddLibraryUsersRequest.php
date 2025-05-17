@@ -12,7 +12,7 @@ class AddLibraryUsersRequest extends FormRequest
     {
         return [
             'users' => ['required', 'array', 'min:1'],
-            'users.*.email' => ['required', 'email', 'exists:users,email'],
+            'users.*.email' => ['required', 'email'],
             'users.*.role' => ['required', Rule::enum(LibraryRole::class)],
         ];
     }
