@@ -4,10 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Enums\LibraryRole;
 use App\Http\Requests\AddLibraryUsersRequest;
+use App\Http\Requests\CreateBookRequest;
 use App\Http\Requests\LibraryRequest;
 use App\Http\Requests\RemoveLibraryUserRequest;
+use App\Http\Resources\BookResource;
 use App\Http\Resources\LibraryResource;
 use App\Http\Resources\LibraryUserResource;
+use App\Models\Book;
 use App\Models\Library;
 use App\Models\User;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -81,28 +84,39 @@ class LibraryController extends Controller
     public function removeUser(RemoveLibraryUserRequest $request, Library $library)
     {
         // The policy checks are already handled in the form request
-        
+
         $userId = $request->input('user_id');
-        
+
         // Check if the user is actually in the library
         if ($library->users()->where('user_id', $userId)->exists()) {
             $library->users()->detach($userId);
             return response()->json(null, 204);
         }
-        
+
         return response()->json(['message' => 'User is not a member of this library'], 422);
     }
-    
-    /**
-     * Get all users for a specific library with their roles.
-     */
+
     public function getUsers(Library $library)
     {
         $this->authorize('view', $library);
-        
+
         // Eager load the pivot data which contains the role
         $users = $library->users()->get();
-        
+
         return LibraryUserResource::collection($users);
+    }
+
+    public function createBook(CreateBookRequest $request, Library $library)
+    {
+        $library->books()->create($request->validated());
+    }
+
+    public function getBooks(Library $library)
+    {
+        $this->authorize('view', $library);
+
+        $books = $library->books()->get();
+
+        return BookResource::collection($books);
     }
 }
