@@ -108,14 +108,24 @@ class LibraryController extends Controller
 
     public function createBook(CreateBookRequest $request, Library $library)
     {
-        $library->books()->create($request->validated());
+        $book = $library->books()->create($request->validated());
+
+        return new BookResource($book);
+    }
+
+    public function updateBook(CreateBookRequest $request, Library $library, Book $book)
+    {
+        $book = $library->books()->findOrFail($book->id);
+        $book->update($request->validated());
+
+        return new BookResource($book);
     }
 
     public function getBooks(Library $library)
     {
         $this->authorize('view', $library);
 
-        $books = $library->books()->get();
+        $books = $library->books()->get()->sortByDesc('created_at');
 
         return BookResource::collection($books);
     }
