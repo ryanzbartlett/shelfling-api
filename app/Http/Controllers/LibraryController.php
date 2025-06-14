@@ -108,6 +108,8 @@ class LibraryController extends Controller
 
     public function createBook(CreateBookRequest $request, Library $library)
     {
+        $this->authorize('update-books', $library);
+
         $book = $library->books()->create($request->validated());
 
         return new BookResource($book);
@@ -128,5 +130,21 @@ class LibraryController extends Controller
         $books = $library->books()->get()->sortByDesc('created_at');
 
         return BookResource::collection($books);
+    }
+
+    public function getBook(Library $library, Book $book)
+    {
+        $this->authorize('view', $library);
+
+        $book = $library->books()->findOrFail($book->id);
+
+        return new BookResource($book);
+    }
+
+    public function removeBook(Library $library, Book $book)
+    {
+        $this->authorize('update-books', $library);
+        $book = $library->books()->findOrFail($book->id);
+        $book->delete();
     }
 }

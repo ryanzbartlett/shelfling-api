@@ -16,6 +16,6 @@ class CreateBookRequest extends FormRequest
 
     public function authorize(): bool
     {
-        return $this->user()->can('update', $this->route('library'));
+        return $this->user()->can('update-books', $this->route('library'));
     }
 }

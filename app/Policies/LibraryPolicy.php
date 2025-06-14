@@ -43,6 +43,17 @@ class LibraryPolicy
         return $hasAccess && $isOwner;
     }
 
+    public function updateBooks(User $user, Library $library): bool
+    {
+        $hasAccess = $library->users()
+            ->where('user_id', $user->id)
+            ->exists();
+
+        $isEditor = $user->hasLibraryRoleAtLeast($library, LibraryRole::EDITOR);
+
+        return $hasAccess && $isEditor;
+    }
+
     public function delete(User $user, Library $library): bool
     {
         $hasAccess = $library->users()
